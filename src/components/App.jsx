@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './button/Button';
 import { ImageGallery } from './imageGallery/ImageGallery';
 import { Modal } from './modal/Modal';
@@ -8,124 +8,114 @@ import { Watch } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export class App extends React.Component {
-  state = {
-    images: [],
-    isOpen: false,
-    isLoading: false,
-    selectedImage: null,
-    total: null,
-    page: 1,
-    per_page: 12,
-    q: '',
-    totalHits: '',
-    error: '',
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [total, setTotal] = useState(null);
+  const [page, setPage] = useState(1);
+  const [per_page, setPer_page] = useState(12);
+  const [q, setQ] = useState('');
+  const [totalHits, setTotalHits] = useState(null);
+  const [error, setError] = useState('');
 
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.page !== prevState.page || this.state.q !== prevState.q) {
-      this.setState({ isLoading: true });
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
 
       try {
         const res = await fetchImage({
-          page: this.state.page,
-          q: this.state.q,
-          totalHits: this.state.totalHits,
+          page,
+          q,
+          totalHits,
         });
+        console.log(res);
 
-        this.setState(prev => ({
-          images: [...prev.images, ...res.hits],
-          totalHits: res.totalHits,
-        }));
+        setImages(prevImages => [...prevImages, ...res.hits]);
+        setTotalHits(res.totalHits);
       } catch (err) {
-        this.setState({ error: err.message }, () => {
-          toast.error(this.state.error);
-        });
+        setError(err.message);
       } finally {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }
+    };
+
+    if (q !== '' && (page === 1 || totalHits !== null)) {
+      fetchData();
     }
-  }
+  }, [page, q, totalHits]);
+  useEffect(() => {}, []);
 
-  handleLoadMore = () => {
-    this.setState(prev => ({ page: prev.page + 1 }));
+  const handleLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  handleSetQuery = q => {
-    this.setState({ q, images: [], page: 1 });
+  const handleSetQuery = newQuery => {
+    setQ(newQuery);
+    setPage(1);
+    setImages([]);
   };
 
-  handleToggleModal = selectedImage => {
-    this.setState(prev => ({
-      isOpen: !prev.isOpen,
-      selectedImage: selectedImage,
-    }));
+  const handleToggleModal = selectedImage => {
+    setIsOpen(prevIsOpen => !prevIsOpen);
+    setSelectedImage(selectedImage);
   };
 
-  render() {
-    const { images, isLoading, isOpen, selectedImage, totalHits } = this.state;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        fontSize: 16,
+        color: '#010101',
+      }}
+    >
+      <Searchbar query={q} setQuery={handleSetQuery} />
+      {!images.length && <p>start you search...</p>}
 
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          fontSize: 16,
-          color: '#010101',
-        }}
-      >
-        <Searchbar query={this.state.q} setQuery={this.handleSetQuery} />
-        {!images.length && <p>start you search...</p>}
+      {images.length ? (
+        <p>
+          You find {totalHits} images {q}
+        </p>
+      ) : null}
 
-        {images.length ? (
-          <p>
-            You find {totalHits} images {this.state.q}
-          </p>
-        ) : null}
-
-        {isLoading && !images.length ? (
-          <div
-            style={{
-              minHeight: '100vh',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          >
-            <Watch
-              height="180"
-              width="180"
-              radius="48"
-              color="#4fa94d"
-              ariaLabel="watch-loading"
-              wrapperStyle={{}}
-              wrapperClassName=""
-              visible={true}
-            />
-          </div>
-        ) : (
-          <ImageGallery
-            handleToggleModal={this.handleToggleModal}
-            images={images}
+      {isLoading && !images.length ? (
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          <Watch
+            height="180"
+            width="180"
+            radius="48"
+            color="#4fa94d"
+            ariaLabel="watch-loading"
+            wrapperStyle={{}}
+            wrapperClassName=""
+            visible={true}
           />
-        )}
-        {totalHits > images.length ? (
-          <Button isLoading={isLoading} onClick={this.handleLoadMore} />
-        ) : null}
-        {isOpen ? (
-          <Modal
-            closeModal={this.handleToggleModal}
-            selectedImage={selectedImage}
-          />
-        ) : null}
-        <ToastContainer />
-      </div>
-    );
-  }
-}
+        </div>
+      ) : (
+        <ImageGallery handleToggleModal={handleToggleModal} images={images} />
+      )}
+      {totalHits > images.length ? (
+        <Button isLoading={isLoading} onClick={handleLoadMore} />
+      ) : null}
+      {isOpen ? (
+        <Modal closeModal={handleToggleModal} selectedImage={selectedImage} />
+      ) : null}
+      <ToastContainer />
+    </div>
+  );
+};

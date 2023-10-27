@@ -1,53 +1,51 @@
 import React from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types'; // ES6
+import { useState } from 'react';
 
-export class Searchbar extends React.Component {
-  static propTypes = {
-    setQuery: propTypes.func.isRequired,
-    query: propTypes.string.isRequired,
-  };
+export const Searchbar = props => {
+  const [searchValue, setSearchValue] = useState('');
 
-  state = {
-    searchValue: '',
-  };
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    if (!this.state.searchValue) {
+    if (!searchValue) {
       return;
     }
-    this.props.setQuery(this.state.searchValue);
+    props.setQuery(searchValue);
   };
-  handleOnChange = e => {
-    this.setState({ searchValue: e.target.value });
+  const handleOnChange = e => {
+    setSearchValue(e.target.value);
   };
 
-  render() {
-    return (
-      <StyledHeader className="searchbar">
-        <form onSubmit={this.handleSubmit} className="form">
-          <button
-            disabled={this.props.query.trim() === this.state.searchValue.trim()}
-            type="submit"
-            className="button"
-          >
-            <span className="button-label">Search</span>
-          </button>
+  return (
+    <StyledHeader className="searchbar">
+      <form onSubmit={handleSubmit} className="form">
+        <button
+          disabled={props.query.trim() === searchValue.trim()}
+          type="submit"
+          className="button"
+        >
+          <span className="button-label">Search</span>
+        </button>
 
-          <input
-            onChange={this.handleOnChange}
-            className="input"
-            type="search"
-            autoComplete="off"
-            autoFocus
-            value={this.state.searchValue}
-            placeholder="Enter any word for search"
-          />
-        </form>
-      </StyledHeader>
-    );
-  }
-}
+        <input
+          onChange={handleOnChange}
+          className="input"
+          type="search"
+          autoComplete="off"
+          autoFocus
+          value={searchValue}
+          placeholder="Enter any word for search"
+        />
+      </form>
+    </StyledHeader>
+  );
+};
+
+Searchbar.propTypes = {
+  setQuery: propTypes.func.isRequired,
+  query: propTypes.string.isRequired,
+};
 
 const StyledHeader = styled.div`
   background-color: lightseagreen;
