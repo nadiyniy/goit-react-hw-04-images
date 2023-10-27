@@ -5,7 +5,7 @@ import { Modal } from './modal/Modal';
 import { Searchbar } from './searchbar/Searchbar';
 import { fetchImage } from '../services/api';
 import { Watch } from 'react-loader-spinner';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const App = () => {
@@ -18,11 +18,12 @@ export const App = () => {
   // const [per_page, setPer_page] = useState(12);
   const [q, setQ] = useState('');
   const [totalHits, setTotalHits] = useState(null);
-  const [, setError] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError('');
 
       try {
         const res = await fetchImage({
@@ -30,12 +31,12 @@ export const App = () => {
           q,
           totalHits,
         });
-        console.log(res);
 
         setImages(prevImages => [...prevImages, ...res.hits]);
         setTotalHits(res.totalHits);
       } catch (err) {
         setError(err.message);
+        //toast.error(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -45,8 +46,10 @@ export const App = () => {
       fetchData();
     }
   }, [page, q, totalHits]);
-  useEffect(() => {}, []);
 
+  useEffect(() => {
+    error && toast.error(error);
+  }, [error]);
   const handleLoadMore = () => {
     setPage(prevPage => prevPage + 1);
   };
