@@ -5,7 +5,7 @@ import { Modal } from './modal/Modal';
 import { Searchbar } from './searchbar/Searchbar';
 import { fetchImage } from '../services/api';
 import { Watch } from 'react-loader-spinner';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const App = () => {
@@ -13,12 +13,12 @@ export const App = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [total, setTotal] = useState(null);
+  // const [total, setTotal] = useState(null);
   const [page, setPage] = useState(1);
-  const [per_page, setPer_page] = useState(12);
+  // const [per_page, setPer_page] = useState(12);
   const [q, setQ] = useState('');
   const [totalHits, setTotalHits] = useState(null);
-  const [error, setError] = useState('');
+  const [, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
