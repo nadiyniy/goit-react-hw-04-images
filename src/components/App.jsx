@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Button } from './button/Button';
 import { ImageGallery } from './imageGallery/ImageGallery';
 import { Modal } from './modal/Modal';
@@ -7,62 +7,79 @@ import { fetchImage } from '../services/api';
 import { Watch } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { imageReduce, initialState } from 'store/reducer';
 
 export const App = () => {
-  const [images, setImages] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  // const [total, setTotal] = useState(null);
-  const [page, setPage] = useState(1);
-  // const [per_page, setPer_page] = useState(12);
-  const [q, setQ] = useState('');
-  const [totalHits, setTotalHits] = useState(null);
-  const [error, setError] = useState('');
+  // const [images, setImages] = useState([]);
+  // const [isOpen, setIsOpen] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [selectedImage, setSelectedImage] = useState(null);
+  // const [page, setPage] = useState(1);
+  // const [queryValue, setQ] = useState('');
+  // const [totalHits, setTotalHits] = useState(null);
+  // const [error, setError] = useState('');
+  const [state, dispatch] = useReducer(imageReduce, initialState);
+  const {
+    images,
+    isOpen,
+    isLoading,
+    selectedImage,
+    page,
+    queryValue,
+    totalHits,
+    error,
+  } = state;
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      setError('');
+      dispatch({ type: 'loader', payload: true });
+      // setIsLoading(true);
+      dispatch({ type: 'error', payload: '' });
+      // setError('');
 
       try {
         const res = await fetchImage({
           page,
-          q,
+          q: queryValue,
           totalHits,
         });
 
-        setImages(prevImages => [...prevImages, ...res.hits]);
-        setTotalHits(res.totalHits);
+        dispatch({ type: 'fetchImage', payload: res.hits });
+        // setImages(prevImages => [...prevImages, ...res.hits]);
+
+        dispatch({ type: 'totalHits', payload: res.totalHits });
+        // setTotalHits(res.totalHits);
       } catch (err) {
-        setError(err.message);
-        //toast.error(err.message);
+        dispatch({ type: 'error', payload: err.message });
+        // setError(err.message);
       } finally {
-        setIsLoading(false);
+        dispatch({ type: 'loader', payload: false });
+        // setIsLoading(false);
       }
     };
 
-    if (q !== '' && (page === 1 || totalHits !== null)) {
-      fetchData();
-    }
-  }, [page, q, totalHits]);
+    queryValue && fetchData();
+  }, [page, queryValue, totalHits]);
 
   useEffect(() => {
     error && toast.error(error);
   }, [error]);
   const handleLoadMore = () => {
-    setPage(prevPage => prevPage + 1);
+    dispatch({ type: 'loadMorePage' });
+    // setPage(prevPage => prevPage + 1);
   };
 
   const handleSetQuery = newQuery => {
-    setQ(newQuery);
-    setPage(1);
-    setImages([]);
+    dispatch({ type: 'newQuery', payload: newQuery });
+    // setQ(newQuery);
+    // setPage(1);
+    // setImages([]);
   };
 
   const handleToggleModal = selectedImage => {
-    setIsOpen(prevIsOpen => !prevIsOpen);
-    setSelectedImage(selectedImage);
+    dispatch({ type: 'toggleModal', payload: selectedImage });
+    // setIsOpen(prevIsOpen => !prevIsOpen);
+    // setSelectedImage(selectedImage);
   };
 
   return (
@@ -75,12 +92,12 @@ export const App = () => {
         color: '#010101',
       }}
     >
-      <Searchbar query={q} setQuery={handleSetQuery} />
+      <Searchbar query={queryValue} setQuery={handleSetQuery} />
       {!images.length && <p>start you search...</p>}
 
       {images.length ? (
         <p>
-          You find {totalHits} images {q}
+          You find {totalHits} images {queryValue}
         </p>
       ) : null}
 

@@ -60,6 +60,26 @@ const StyledHeader = styled.div`
   left: 0;
   & button {
     cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    border-radius: 5px;
+    /* width: 20px; */
+    /* height: 20px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 1px 1px 1px black;
+    transition: all 0.2s ease;
+    border: 1px solid black;
+    &:hover {
+      scale: 0.99;
+      box-shadow: 0 0 0px 0px black;
+    }
+    &:disabled {
+      scale: 0.99;
+    }
   }
   & form {
     display: flex;
@@ -67,18 +87,22 @@ const StyledHeader = styled.div`
     max-width: 500px;
     min-width: 280px;
     width: 100%;
+    position: relative;
 
     & input {
       width: 100%;
-      padding: 10px 30px;
+      padding: 10px 10px;
       border: 1px solid black;
       border-radius: 5px;
       box-shadow: 0 0 3px 1px black;
+      padding-left: 70px;
+
       &::placeholder {
         text-align: center;
       }
       @media screen and (max-width: 768px) {
-        padding: 5px 30px;
+        padding: 5px 10px;
+        padding-left: 70px;
       }
 
       &:hover {
