@@ -30,10 +30,12 @@ export const imageReduce = (state, action) => {
       return { ...state, page: state.page + 1 };
 
     case 'newQuery':
-      return { ...state, queryValue: payload, page: 1, images: [] };
+      return { ...state, queryValue: payload, images: [] };
 
     case 'toggleModal':
       return { ...state, isOpen: !state.isOpen, selectedImage: payload };
+    case 'setPage':
+      return { ...state, page: 1 };
 
     default:
       return state;

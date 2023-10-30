@@ -32,29 +32,24 @@ export const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch({ type: 'loader', payload: true });
-      // setIsLoading(true);
-      dispatch({ type: 'error', payload: '' });
-      // setError('');
-
       try {
+        dispatch({ type: 'loader', payload: true });
+
+        dispatch({ type: 'error', payload: '' });
+
+        dispatch({ type: 'setPage', payload: 1 });
         const res = await fetchImage({
           page,
           q: queryValue,
-          totalHits,
         });
 
         dispatch({ type: 'fetchImage', payload: res.hits });
-        // setImages(prevImages => [...prevImages, ...res.hits]);
 
         dispatch({ type: 'totalHits', payload: res.totalHits });
-        // setTotalHits(res.totalHits);
       } catch (err) {
         dispatch({ type: 'error', payload: err.message });
-        // setError(err.message);
       } finally {
         dispatch({ type: 'loader', payload: false });
-        // setIsLoading(false);
       }
     };
 
