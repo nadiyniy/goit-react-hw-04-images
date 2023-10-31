@@ -80,6 +80,7 @@ const StyledHeader = styled.div`
     &:disabled {
       scale: none;
       box-shadow: none;
+      cursor: default;
     }
   }
   & form {
