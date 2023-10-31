@@ -78,7 +78,8 @@ const StyledHeader = styled.div`
       box-shadow: 0 0 0px 0px black;
     }
     &:disabled {
-      scale: 0.99;
+      scale: none;
+      box-shadow: none;
     }
   }
   & form {

@@ -37,7 +37,7 @@ export const App = () => {
 
         dispatch({ type: 'error', payload: '' });
 
-        dispatch({ type: 'setPage', payload: 1 });
+        // dispatch({ type: 'setPage', payload: 1 });
         const res = await fetchImage({
           page,
           q: queryValue,
@@ -54,7 +54,7 @@ export const App = () => {
     };
 
     queryValue && fetchData();
-  }, [page, queryValue, totalHits]);
+  }, [page, queryValue]);
 
   useEffect(() => {
     error && toast.error(error);
